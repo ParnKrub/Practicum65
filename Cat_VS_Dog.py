@@ -1,4 +1,3 @@
-from contextlib import redirect_stderr
 import pygame
 import math
 import random
@@ -32,6 +31,7 @@ PLAYER_HEIGHT = 80
 PLAYER_WIDTH = 70
 BOX_START_POS_BLUE = BLUE_POSX+BOX_LENGTH+1
 BOX_START_POS_RED = RED_POSX-BOX_LENGTH-1
+VEL_PENELTY = 0.3
 
 # https://www.freepik.com/vectors/alien-planet Alien planet vector created by upklyak
 BACKGROUND = pygame.transform.scale(pygame.image.load(
@@ -70,19 +70,22 @@ class Box(object):
 def draw_window(line, redBox, shoot):
     WIN.blit(BACKGROUND, (0, 0))
     pygame.draw.rect(WIN, BLACK, WALL)
+
     if shoot:
         redBox.draw(WIN)
+    if not shoot:
+        pygame.draw.line(WIN, BLACK, line[0], line[1])
+
     WIN.blit(GURA, (BLUE_POSX, BLUE_POSY-PLAYER_HEIGHT))
     WIN.blit(CALLIOPE, (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
     WIN.blit(FLOOR, (0, HEIGHT-15))
 
-    pygame.draw.line(WIN, BLACK, line[0], line[1])
     pygame.display.update()
 
 
-def find_angle(pos):
-    sX = WIDTH//2
-    sY = HEIGHT-BOX_LENGTH
+def find_angle(line, pos):
+    sX = line[0][0]
+    sY = line[0][1]
     try:
         angle = math.atan((sY-pos[1])/(sX-pos[0]))
     except:
@@ -137,7 +140,7 @@ def block_collide_wall(po):
 def main():
 
     clock = pygame.time.Clock()
-    redBox = Box(BOX_START_POS_BLUE, HEIGHT-BOX_LENGTH-51, BOX_LENGTH, WHITE)
+    redBox = Box(BOX_START_POS_BLUE, HEIGHT-BOX_LENGTH-30, BOX_LENGTH, WHITE)
     wind_speed = random.randint(-20, 20)
     x = 0
     y = 0
@@ -146,11 +149,14 @@ def main():
     vely = 0
     shoot = False
     run = True
-    player = P_BLUE
+    player = 'BLUE'
     while run:
         clock.tick(FPS)
         pos = pygame.mouse.get_pos()
-        line = [(WIDTH//2, HEIGHT-BOX_LENGTH), pos]
+        if player == 'BLUE':
+            line = [(BOX_START_POS_BLUE, HEIGHT-BOX_LENGTH-30), pos]
+        else:
+            line = [(BOX_START_POS_RED, HEIGHT-BOX_LENGTH-30), pos]
 
         if shoot:
             # nowPos = handle_shooting(redBox, y, velx, vely,
@@ -166,8 +172,8 @@ def main():
 
                 if block_collide_wall(Box.box_path(redBox.x, y, velx, vely,
                                                    BOX_FPS, time, wind_speed)):
-                    VEL_PENELTY = random.randint(20, 80)/100
                     velx = -velx*VEL_PENELTY
+                    wind_speed = 0
 
                 po = Box.box_path(redBox.x, y, velx, vely,
                                   BOX_FPS, time, wind_speed)
@@ -176,14 +182,14 @@ def main():
             elif redBox.y >= HEIGHT - redBox.length:
                 shoot = False
                 wind_speed = random.randint(-20, 20)
-                print(wind_speed)
-                redBox.y = HEIGHT-BOX_LENGTH - 51
-                if player == P_RED:
+                print('Wind speed =', wind_speed)
+                redBox.y = HEIGHT-BOX_LENGTH - 30
+                if player == 'RED':
                     redBox.x = BOX_START_POS_BLUE
-                    player = P_BLUE
+                    player = 'BLUE'
                 else:
                     redBox.x = BOX_START_POS_RED
-                    player = P_RED
+                    player = 'RED'
 
         draw_window(line, redBox, shoot)
 
@@ -196,7 +202,7 @@ def main():
                     y = redBox.y
                     time = 0
                     power = 250/POWER_FACTOR
-                    angle = find_angle(pos)
+                    angle = find_angle(line, pos)
                     velx = math.cos(angle) * power
                     vely = math.sin(angle) * power
 
