@@ -2,6 +2,7 @@ import pygame
 import math
 import random
 import os
+from practicum import find_mcu_boards, McuBoard, PeriBoard
 
 pygame.font.init()
 
@@ -11,6 +12,8 @@ WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cat VS Dog")
 
+mcu = McuBoard(find_mcu_boards()[0])
+peri = PeriBoard(mcu)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -173,7 +176,10 @@ def block_touch_ground(box):
 
 
 def main():
-
+    input("Cover the light sensor and press ENTER...")
+    light_min = peri.get_light()
+    input("Remove your hand and press ENTER...")
+    light_max = peri.get_light()
     clock = pygame.time.Clock()
     redBox = Box(BOX_START_POS_BLUE, HEIGHT-BOX_LENGTH-30, BOX_LENGTH, WHITE)
     wind_speed = random.randint(-20, 20)
