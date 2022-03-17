@@ -2,18 +2,13 @@ import pygame
 import math
 import random
 import os
-from practicum import find_mcu_boards, McuBoard, PeriBoard
 
 pygame.font.init()
 
-P_BLUE = 1
-P_RED = 2
 WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cat VS Dog")
 
-mcu = McuBoard(find_mcu_boards()[0])
-peri = PeriBoard(mcu)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -34,43 +29,50 @@ PLAYER_HEIGHT = 80
 PLAYER_WIDTH = 70
 BOX_START_POS_BLUE = BLUE_POSX+BOX_LENGTH+1
 BOX_START_POS_RED = RED_POSX-BOX_LENGTH-1
-VEL_PENELTY = 0.3
+VEL_PENELTY = 1.1
+ARROW_LENGTH = 120
+ARROW_WIDTH = 20
 
 # https://www.freepik.com/vectors/alien-planet Alien planet vector created by upklyak
 BACKGROUND = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'BG.jpg')), (WIDTH, HEIGHT))
+    os.path.join('python', 'Assets', 'BG.jpg')), (WIDTH, HEIGHT))
 FLOOR = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'platform2.png')), (WIDTH, 25))
+    os.path.join('python', 'Assets', 'platform2.png')), (WIDTH, 25))
 
+'''The arrow only works between 1 to 179 degrees'''
+ARROW = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'Arrow.png')), (ARROW_LENGTH, ARROW_WIDTH))
+
+# All animations are from Walfie https://walfiegif.wordpress.com
 GURA1 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA2 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA3 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA4 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA5 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA6 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA7 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Gura_7.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Gura_7.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 GURA = [GURA1, GURA2, GURA3, GURA4, GURA5, GURA6, GURA7]
 
 CALLIOPE1 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Calliope_1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Calliope_1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE2 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Calliope_2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Calliope_2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE3 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Calliope_3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Calliope_3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE4 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Calliope_4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Calliope_4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE5 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Calliope_5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Calliope_5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE6 = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'Calliope_6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('python', 'Assets', 'Calliope_6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 CALLIOPE = [CALLIOPE1, CALLIOPE2, CALLIOPE3, CALLIOPE4, CALLIOPE5, CALLIOPE6]
 
@@ -98,17 +100,26 @@ class Box(object):
         return (newX, newY)
 
 
-def draw_window(line, redBox, shoot, framenum):
+def draw_window(line, redBox, shoot, framenum, angle, player):
     WIN.blit(BACKGROUND, (0, 0))
-
+    extra = 0
     if shoot:
         redBox.draw(WIN)
     if not shoot:
         pygame.draw.line(WIN, BLACK, line[0], line[1])
+        arrow = pygame.transform.rotate(ARROW, round((angle*180)/math.pi))
+        if angle >= math.pi/2:
+            extra = math.cos(angle)*ARROW_LENGTH
+        if player == 'BLUE':
+            WIN.blit(arrow, (BOX_START_POS_BLUE-(math.sin(angle)*10)+extra, HEIGHT -
+                             BOX_LENGTH-(math.sin(angle)*ARROW_LENGTH)-40))
+        else:
+            WIN.blit(arrow, (BOX_START_POS_RED-(math.sin(angle)*10)+extra, HEIGHT -
+                             BOX_LENGTH-(math.sin(angle)*ARROW_LENGTH)-40))
     pygame.draw.rect(WIN, BLACK, WALL)
-    WIN.blit(GURA[framenum//3 % len(GURA)],
+    WIN.blit(GURA[framenum//4 % len(GURA)],
              (BLUE_POSX, BLUE_POSY-PLAYER_HEIGHT))
-    WIN.blit(CALLIOPE[framenum//3 % len(CALLIOPE)],
+    WIN.blit(CALLIOPE[framenum//4 % len(CALLIOPE)],
              (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
     WIN.blit(FLOOR, (0, HEIGHT-15))
     pygame.display.update()
@@ -135,12 +146,12 @@ def find_angle(line, pos):
 
 
 def block_collide_wall(po):
-    if (WIDTH//2 - WALL_WIDTH - WALL_WIDTH//2 < po[0] < WIDTH//2 - WALL_WIDTH//2 + WALL_WIDTH) and (po[1] + BOX_LENGTH > HEIGHT - WALL_HEIGHT):
+    if (WIDTH//2 - WALL_WIDTH - WALL_WIDTH//2 < po[0] < WIDTH//2 - WALL_WIDTH//2 + WALL_WIDTH
+            and po[1] + BOX_LENGTH > HEIGHT - WALL_HEIGHT):
         return True
-
     '''Block touch the border'''
-    # if (po[0] < 0 or po[0] > WIDTH-BOX_LENGTH):
-    #     return True
+    if (po[0] < 0 or po[0] > WIDTH-BOX_LENGTH):
+        return True
     return False
 
 
@@ -176,10 +187,6 @@ def block_touch_ground(box):
 
 
 def main():
-    input("Cover the light sensor and press ENTER...")
-    light_min = peri.get_light()
-    input("Remove your hand and press ENTER...")
-    light_max = peri.get_light()
     clock = pygame.time.Clock()
     redBox = Box(BOX_START_POS_BLUE, HEIGHT-BOX_LENGTH-30, BOX_LENGTH, WHITE)
     wind_speed = random.randint(-20, 20)
@@ -193,6 +200,7 @@ def main():
     run = True
     player = 'BLUE'
     while run:
+
         clock.tick(FPS)
         pos = pygame.mouse.get_pos()
         if player == 'BLUE':
@@ -211,10 +219,12 @@ def main():
             # print(redBox.x, redBox.y, shoot)
             if redBox.y < HEIGHT - redBox.length:
                 time += BOX_FPS
-
+                print(velx)
                 if block_collide_wall(Box.box_path(redBox.x, y, velx, vely,
                                                    BOX_FPS, time, wind_speed)):
-                    velx = -velx*VEL_PENELTY
+                    if (abs(velx) < 300):
+                        velx = velx*VEL_PENELTY
+                    velx = -velx
                     wind_speed = 0
 
                 po = Box.box_path(redBox.x, y, velx, vely,
@@ -232,19 +242,21 @@ def main():
                 else:
                     redBox.x = BOX_START_POS_RED
                     player = 'RED'
+        if not shoot:
+            angle = find_angle(line, pos)
 
-        draw_window(line, redBox, shoot, framenum)
+        draw_window(line, redBox, shoot, framenum, angle, player)
         framenum = framenum+1
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if shoot == False:
+                if not shoot:
                     shoot = True
                     y = redBox.y
                     time = 0
-                    power = 250/POWER_FACTOR
+                    power = 500/POWER_FACTOR
                     angle = find_angle(line, pos)
                     velx = math.cos(angle) * power
                     vely = math.sin(angle) * power
