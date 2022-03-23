@@ -269,6 +269,10 @@ def main():
                     angle = find_angle(light)
                 elif not shoot:
                     power = find_power(light)/POWER_FACTOR
+
+                draw_window(line, redBox, shoot, framenum, angle, player)
+                framenum = framenum+1
+
                 if peri.get_switch():
                     if not angset:
                         angset = True
