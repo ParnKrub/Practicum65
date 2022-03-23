@@ -2,12 +2,15 @@ import pygame
 import math
 import random
 import os
+from practicum import find_mcu_boards, McuBoard, PeriBoard
 
 pygame.font.init()
 
 WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cat VS Dog")
+mcu = McuBoard(find_mcu_boards()[0])
+peri = PeriBoard(mcu)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -35,46 +38,56 @@ ARROW_WIDTH = 20
 
 # https://www.freepik.com/vectors/alien-planet Alien planet vector created by upklyak
 BACKGROUND = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'BG.jpg')), (WIDTH, HEIGHT))
+    os.path.join('Assets', 'BG.bmp')), (WIDTH, HEIGHT))
 FLOOR = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'platform2.png')), (WIDTH, 25))
+    os.path.join('Assets', 'platform2.bmp')), (WIDTH, 25))
 
 '''The arrow only works between 1 to 179 degrees'''
 ARROW = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Arrow.png')), (ARROW_LENGTH, ARROW_WIDTH))
+    os.path.join('Assets', 'Arrow.bmp')), (ARROW_LENGTH, ARROW_WIDTH))
 
 # All animations are from Walfie https://walfiegif.wordpress.com
 GURA1 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_1.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA2 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_2.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA3 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_3.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA4 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_4.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA5 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_5.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA6 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_6.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 GURA7 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Gura_7.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Gura_7.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 GURA = [GURA1, GURA2, GURA3, GURA4, GURA5, GURA6, GURA7]
 
 CALLIOPE1 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Calliope_1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Calliope_1.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE2 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Calliope_2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Calliope_2.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE3 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Calliope_3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Calliope_3.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE4 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Calliope_4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Calliope_4.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE5 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Calliope_5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Calliope_5.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 CALLIOPE6 = pygame.transform.scale(pygame.image.load(
-    os.path.join('python', 'Assets', 'Calliope_6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+    os.path.join('Assets', 'Calliope_6.bmp')), (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 CALLIOPE = [CALLIOPE1, CALLIOPE2, CALLIOPE3, CALLIOPE4, CALLIOPE5, CALLIOPE6]
+print("Cover the light sensor and press the button...")
+while(True):
+    if(peri.get_switch()):
+        light_min = peri.get_light()
+        break
+print("Remove your hand and press the button...")
+while(True):
+    if(peri.get_switch()):
+        light_max = peri.get_light()
+        break
 
 
 class Box(object):
@@ -101,6 +114,7 @@ class Box(object):
 
 
 def draw_window(line, redBox, shoot, framenum, angle, player):
+    WIN.fill((255, 255, 255))
     WIN.blit(BACKGROUND, (0, 0))
     extra = 0
     if shoot:
@@ -125,23 +139,23 @@ def draw_window(line, redBox, shoot, framenum, angle, player):
     pygame.display.update()
 
 
-def find_angle(line, pos):
-    sX = line[0][0]
-    sY = line[0][1]
-    try:
-        angle = math.atan((sY-pos[1])/(sX-pos[0]))
-    except:
-        angle = math.pi/2
+def find_power(light):
+    if light > light_max:
+        power = 1000
+    elif light < light_min:
+        power = 0
+    else:
+        power = ((light-light_min)/(light_max-light_min))*1000
+    return power
 
-    if pos[1] < sY and pos[0] > sX:
-        angle = abs(angle)
-    elif pos[1] < sY and pos[0] < sX:
-        angle = math.pi - abs(angle)
-    elif pos[1] > sY and pos[0] < sX:
-        angle = math.pi + abs(angle)
-    elif pos[1] > sY and pos[0] > sX:
-        angle = (math.pi*2) - abs(angle)
 
+def find_angle(light):
+    if light > light_max:
+        angle = 179*math.pi/180
+    elif light < light_min:
+        angle = math.pi/180
+    else:
+        angle = ((light-light_min)/(light_max-light_min))*math.pi
     return angle
 
 
@@ -197,8 +211,10 @@ def main():
     velx = 0
     vely = 0
     shoot = False
+    angset = False
     run = True
     player = 'BLUE'
+    peri.set_led(0, 1)
     while run:
 
         clock.tick(FPS)
@@ -238,28 +254,36 @@ def main():
                 redBox.y = HEIGHT-BOX_LENGTH - 30
                 if player == 'RED':
                     redBox.x = BOX_START_POS_BLUE
+                    peri.set_led(0, 1)
+                    peri.set_led(2, 0)
                     player = 'BLUE'
                 else:
                     redBox.x = BOX_START_POS_RED
+                    peri.set_led(0, 0)
+                    peri.set_led(2, 1)
                     player = 'RED'
         if not shoot:
-            angle = find_angle(line, pos)
+            while(True):
+                light = peri.get_light()
+                if not angset:
+                    angle = find_angle(light)
+                elif not shoot:
+                    power = find_power(light)/POWER_FACTOR
+                if peri.get_switch():
+                    if not angset:
+                        angset = True
+                        angle = find_angle(light)
+                    elif not shoot:
+                        shoot = True
+                        y = redBox.y
+                        time = 0
+                        power = find_power()/POWER_FACTOR
+                        velx = math.cos(angle) * power
+                        vely = math.sin(angle) * power
+                        break
 
         draw_window(line, redBox, shoot, framenum, angle, player)
         framenum = framenum+1
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if not shoot:
-                    shoot = True
-                    y = redBox.y
-                    time = 0
-                    power = 500/POWER_FACTOR
-                    angle = find_angle(line, pos)
-                    velx = math.cos(angle) * power
-                    vely = math.sin(angle) * power
 
     pygame.quit()
 
