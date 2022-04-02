@@ -1,3 +1,4 @@
+from pickle import FALSE
 from numpy import blackman
 import pygame
 import math
@@ -236,6 +237,13 @@ def main():
             line = [(BOX_START_POS_RED, HEIGHT-BOX_LENGTH-30), pos]
 
         if shoot:
+            keys_pressed = pygame.key.get_pressed()
+            if keys_pressed[pygame.K_SPACE]:
+                if not skill_used:
+                    print("skill used")
+                    velx = 0
+                    wind_speed = 0
+                    skill_used = True
             if redBox.y < HEIGHT - redBox.length:
                 time += BOX_FPS
                 if block_collide_wall(Box.box_path(redBox.x, y, velx, vely,
@@ -276,6 +284,7 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not shoot:
                     shoot = True
+                    skill_used = False
                     st_frame = framenum
                     y = redBox.y
                     time = 0
