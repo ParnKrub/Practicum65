@@ -1,3 +1,4 @@
+from numpy import blackman
 import pygame
 import math
 import random
@@ -21,17 +22,22 @@ WALL_WIDTH = 30
 WALL_HEIGHT = HEIGHT//3
 WALL = pygame.Rect(WIDTH//2 - WALL_WIDTH//2, HEIGHT -
                    WALL_HEIGHT, WALL_WIDTH, WALL_HEIGHT)
+WHITERECT = pygame.Rect(0, 0, WIDTH, 35)
 BLUE_POSX = 50
 BLUE_POSY = HEIGHT-15
 RED_POSX = WIDTH-50
 RED_POSY = HEIGHT-15
 PLAYER_HEIGHT = 80
 PLAYER_WIDTH = 70
-BOX_START_POS_BLUE = BLUE_POSX+BOX_LENGTH+1
-BOX_START_POS_RED = RED_POSX-BOX_LENGTH-1
+BOX_START_POS_BLUE = BLUE_POSX+BOX_LENGTH+20
+BOX_START_POS_RED = RED_POSX-BOX_LENGTH-20
 VEL_PENELTY = 1.1
 ARROW_LENGTH = 120
 ARROW_WIDTH = 20
+HP_WIDTH = 4
+
+HP_FONT = pygame.font.SysFont('comicsans', 12)
+WIND_FONT = pygame.font.SysFont('comicsans', 30)
 
 # https://www.freepik.com/vectors/alien-planet Alien planet vector created by upklyak
 BACKGROUND = pygame.transform.scale(pygame.image.load(
@@ -84,9 +90,11 @@ class Box(object):
         self.length = length
         self.color = color
 
+    def box(self):
+        return pygame.Rect(self.x, self.y, self.length, self.length)
+
     def draw(self, WIN):
-        box = pygame.Rect(self.x, self.y, self.length, self.length)
-        pygame.draw.rect(WIN, self.color, box)
+        pygame.draw.rect(WIN, self.color, self.box())
 
     def box_path(nowx, starty, velx, vely, time_relative, time_absolute, wind_speed):
 
@@ -99,14 +107,28 @@ class Box(object):
 
         return (newX, newY)
 
+    def touch_ground(self):
+        if self.y > HEIGHT - self.length - 1:
+            return True
 
-def draw_window(line, redBox, shoot, framenum, angle, player):
+    def collide_gura(self):
+        if (BLUE_POSX - PLAYER_WIDTH - PLAYER_WIDTH//2 < self.x < BLUE_POSX + PLAYER_WIDTH - PLAYER_WIDTH//2
+                and self.y + BOX_LENGTH > HEIGHT - PLAYER_HEIGHT):
+            return True
+
+    def collide_calli(self):
+        if (RED_POSX - PLAYER_WIDTH - PLAYER_WIDTH//2 < self.x < RED_POSX + PLAYER_WIDTH - PLAYER_WIDTH//2
+                and self.y + BOX_LENGTH > HEIGHT - PLAYER_HEIGHT):
+            return True
+
+
+def draw_window(redBox, shoot, framenum, angle, player, wind_spd, blue_hp, red_hp):
     WIN.blit(BACKGROUND, (0, 0))
     extra = 0
     if shoot:
         redBox.draw(WIN)
     if not shoot:
-        pygame.draw.line(WIN, BLACK, line[0], line[1])
+        # pygame.draw.line(WIN, BLACK, line[0], line[1])
         arrow = pygame.transform.rotate(ARROW, round((angle*180)/math.pi))
         if angle >= math.pi/2:
             extra = math.cos(angle)*ARROW_LENGTH
@@ -122,6 +144,30 @@ def draw_window(line, redBox, shoot, framenum, angle, player):
     WIN.blit(CALLIOPE[framenum//4 % len(CALLIOPE)],
              (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
     WIN.blit(FLOOR, (0, HEIGHT-15))
+
+    pygame.draw.rect(WIN, WHITE, WHITERECT)
+    wind_spd_text = HP_FONT.render("Wind Speed", 1, BLACK)
+    WIN.blit(wind_spd_text, (WIDTH//2-wind_spd_text.get_width()//2, 3))
+
+    if not shoot:
+        wind_spd_text2 = HP_FONT.render(str(wind_spd), 1, BLACK)
+    else:
+        wind_spd_text2 = HP_FONT.render("-", 1, BLACK)
+
+    WIN.blit(wind_spd_text2, (WIDTH//2-wind_spd_text2.get_width()//2, 18))
+    blue_hp_text = HP_FONT.render("HP: " + str(blue_hp), 1, BLACK)
+    WIN.blit(blue_hp_text, (3, 3))
+    red_hp_text = HP_FONT.render("HP: " + str(red_hp), 1, BLACK)
+    WIN.blit(red_hp_text, (WIDTH-red_hp_text.get_width()-3, 3))
+
+    for i in range(1, blue_hp):
+        blue_hpbar = pygame.Rect(3+(i*HP_WIDTH), 20, HP_WIDTH, 10)
+        pygame.draw.rect(WIN, (round(255-2.5*i), round(2.5*i), 0), blue_hpbar)
+
+    for i in range(1, red_hp):
+        blue_hpbar = pygame.Rect(WIDTH-(3+(i*HP_WIDTH)), 20, HP_WIDTH, 10)
+        pygame.draw.rect(WIN, (round(255-2.5*i), round(2.5*i), 0), blue_hpbar)
+
     pygame.display.update()
 
 
@@ -155,11 +201,14 @@ def block_collide_wall(po):
     return False
 
 
-def block_touch_ground(box):
-    if box.y > HEIGHT - box.length - 1:
-        return True
-
-
+def change_player(color, redBox):
+    redBox.y = HEIGHT-BOX_LENGTH - 30
+    if color == 'RED':
+        redBox.x = BOX_START_POS_BLUE
+        return 'BLUE'
+    else:
+        redBox.x = BOX_START_POS_RED
+        return 'RED'
 # def handle_shooting(box, y, velx, vely,
 #                     BOX_FPS, time, wind_speed):
 
@@ -199,6 +248,8 @@ def main():
     shoot = False
     run = True
     player = 'BLUE'
+    blue_hp = 100
+    red_hp = 100
     while run:
 
         clock.tick(FPS)
@@ -219,7 +270,6 @@ def main():
             # print(redBox.x, redBox.y, shoot)
             if redBox.y < HEIGHT - redBox.length:
                 time += BOX_FPS
-                print(velx)
                 if block_collide_wall(Box.box_path(redBox.x, y, velx, vely,
                                                    BOX_FPS, time, wind_speed)):
                     if (abs(velx) < 300):
@@ -231,21 +281,25 @@ def main():
                                   BOX_FPS, time, wind_speed)
                 redBox.x = po[0]
                 redBox.y = po[1]
-            elif block_touch_ground(redBox):
+            if redBox.touch_ground():
                 shoot = False
                 wind_speed = random.randint(-20, 20)
-                print('Wind speed =', wind_speed)
-                redBox.y = HEIGHT-BOX_LENGTH - 30
-                if player == 'RED':
-                    redBox.x = BOX_START_POS_BLUE
-                    player = 'BLUE'
-                else:
-                    redBox.x = BOX_START_POS_RED
-                    player = 'RED'
+                player = change_player(player, redBox)
+            elif (framenum > st_frame + 30):
+                if redBox.collide_gura():
+                    shoot = False
+                    blue_hp -= 30
+                    player = change_player(player, redBox)
+                elif redBox.collide_calli():
+                    shoot = False
+                    red_hp -= 30
+                    player = change_player(player, redBox)
+
         if not shoot:
             angle = find_angle(line, pos)
 
-        draw_window(line, redBox, shoot, framenum, angle, player)
+        draw_window(redBox, shoot, framenum, angle,
+                    player, wind_speed, blue_hp, red_hp)
         framenum = framenum+1
 
         for event in pygame.event.get():
@@ -254,9 +308,10 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not shoot:
                     shoot = True
+                    st_frame = framenum
                     y = redBox.y
                     time = 0
-                    power = 500/POWER_FACTOR
+                    power = 300/POWER_FACTOR
                     angle = find_angle(line, pos)
                     velx = math.cos(angle) * power
                     vely = math.sin(angle) * power
