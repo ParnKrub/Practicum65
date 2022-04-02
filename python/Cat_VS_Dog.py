@@ -209,30 +209,6 @@ def change_player(color, redBox):
     else:
         redBox.x = BOX_START_POS_RED
         return 'RED'
-# def handle_shooting(box, y, velx, vely,
-#                     BOX_FPS, time, wind_speed):
-
-#     shoot = True
-#     if box.y < HEIGHT - box.length:
-#         time += BOX_FPS
-#         if block_collide_wall(Box.box_path(box.x, y, velx, vely,
-#                                            BOX_FPS, time, wind_speed)):
-#             VEL_PENELTY = random.randint(20, 80)/100
-#             velx = -velx*VEL_PENELTY
-
-#             po = Box.box_path(box.x, y, velx, vely,
-#                               BOX_FPS, time, wind_speed)
-#             box.x = po[0]
-#             box.y = po[1]
-
-#     if box.y >= HEIGHT - box.length:
-#         shoot = False
-#         wind_speed = random.randint(-20, 20)
-#         print(wind_speed)
-#         box.y = HEIGHT-BOX_LENGTH - 51
-#         box.x = BOX_START_POS
-
-#     return (box.x, box.y, shoot, time)
 
 
 def main():
@@ -260,14 +236,6 @@ def main():
             line = [(BOX_START_POS_RED, HEIGHT-BOX_LENGTH-30), pos]
 
         if shoot:
-            # nowPos = handle_shooting(redBox, y, velx, vely,
-            #                          BOX_FPS, time, wind_speed)
-            # redBox.x = nowPos[0]
-            # redBox.y = nowPos[1]
-            # shoot = nowPos[2]
-            # time = nowPos[3]
-
-            # print(redBox.x, redBox.y, shoot)
             if redBox.y < HEIGHT - redBox.length:
                 time += BOX_FPS
                 if block_collide_wall(Box.box_path(redBox.x, y, velx, vely,
