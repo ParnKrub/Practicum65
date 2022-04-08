@@ -83,6 +83,34 @@ CALLIOPE6 = pygame.transform.scale(pygame.image.load(
 
 CALLIOPE = [CALLIOPE1, CALLIOPE2, CALLIOPE3, CALLIOPE4, CALLIOPE5, CALLIOPE6]
 
+GURA_SPIN1 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN2 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN3 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN4 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN5 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN6 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN7 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin7.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN8 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin8.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN9 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin9.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN10 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin10.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN11 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin11.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+GURA_SPIN12 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'spin12.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+
+GURA_SPIN = [GURA_SPIN1, GURA_SPIN2, GURA_SPIN3,
+             GURA_SPIN4, GURA_SPIN5, GURA_SPIN6, GURA_SPIN7, GURA_SPIN8, GURA_SPIN9, GURA_SPIN10, GURA_SPIN11, GURA_SPIN12]
+
 
 class Box(object):
     def __init__(self, x, y, length, color):
@@ -140,10 +168,16 @@ def draw_window(redBox, shoot, framenum, angle, player, wind_spd, blue_hp, red_h
             WIN.blit(arrow, (BOX_START_POS_RED-(math.sin(angle)*10)+extra, HEIGHT -
                              BOX_LENGTH-(math.sin(angle)*ARROW_LENGTH)-40))
     pygame.draw.rect(WIN, BLACK, WALL)
-    WIN.blit(GURA[framenum//4 % len(GURA)],
-             (BLUE_POSX, BLUE_POSY-PLAYER_HEIGHT))
-    WIN.blit(CALLIOPE[framenum//4 % len(CALLIOPE)],
-             (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
+    if blue_hp > 0:
+        WIN.blit(GURA[framenum//4 % len(GURA)],
+                 (BLUE_POSX, BLUE_POSY-PLAYER_HEIGHT))
+    else:
+        WIN.blit(GURA_SPIN[framenum//4 % len(GURA_SPIN)],
+                 (BLUE_POSX, BLUE_POSY-PLAYER_HEIGHT))
+    if red_hp > 0:
+        WIN.blit(CALLIOPE[framenum//4 % len(CALLIOPE)],
+                 (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
+
     WIN.blit(FLOOR, (0, HEIGHT-15))
 
     pygame.draw.rect(WIN, WHITE, WHITERECT)
@@ -227,15 +261,12 @@ def main():
     player = 'BLUE'
     blue_hp = 100
     red_hp = 100
+    end_frame = -1
     while run:
         clock.tick(FPS)
-        if blue_hp <= 0:
-            print("Red wins")
-            pygame.time.delay(1000)
-            run = False
-        elif red_hp <= 0:
-            print("Blue wins")
-            pygame.time.delay(1000)
+        if (blue_hp <= 0 or red_hp <= 0) and end_frame == -1:
+            end_frame = framenum + 300
+        if end_frame != -1 and framenum >= end_frame:
             run = False
         pos = pygame.mouse.get_pos()
         if player == 'BLUE':
