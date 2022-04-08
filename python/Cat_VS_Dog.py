@@ -396,7 +396,7 @@ def main():
             angle = find_angle(line, pos)
 
         draw_window(redBox, shoot, framenum, angle,
-                    player, wind_speed, blue_hp, red_hp, 100)
+                    player, wind_speed, blue_hp, red_hp, power)
         framenum = framenum+1
 
         for event in pygame.event.get():
