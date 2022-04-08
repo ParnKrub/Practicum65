@@ -1,5 +1,3 @@
-from pickle import FALSE
-from numpy import blackman
 import pygame
 import math
 import random
@@ -113,6 +111,60 @@ GURA_SPIN12 = pygame.transform.scale(pygame.image.load(
 GURA_SPIN = [GURA_SPIN1, GURA_SPIN2, GURA_SPIN3,
              GURA_SPIN4, GURA_SPIN5, GURA_SPIN6, GURA_SPIN7, GURA_SPIN8, GURA_SPIN9, GURA_SPIN10, GURA_SPIN11, GURA_SPIN12]
 
+CALLI_DYING1 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying1.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING2 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying2.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING3 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying3.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING4 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying4.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING5 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying5.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING6 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying6.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING7 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying7.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING8 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying8.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING9 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying9.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING10 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying10.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING11 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying11.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING12 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying12.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING13 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying13.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING14 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying14.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING15 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying15.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING16 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying16.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING17 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying17.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING18 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying18.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING19 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying19.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING20 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying20.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING21 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying21.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING22 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying22.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+CALLI_DYING23 = pygame.transform.scale(pygame.image.load(
+    os.path.join('python', 'Assets', 'calldying23.png')), (PLAYER_WIDTH, PLAYER_HEIGHT))
+
+CALLI_DYING = [CALLI_DYING1, CALLI_DYING2, CALLI_DYING3, CALLI_DYING4,
+               CALLI_DYING5, CALLI_DYING6, CALLI_DYING7, CALLI_DYING8,
+               CALLI_DYING9, CALLI_DYING10, CALLI_DYING11, CALLI_DYING12,
+               CALLI_DYING13, CALLI_DYING14, CALLI_DYING15, CALLI_DYING16,
+               CALLI_DYING17, CALLI_DYING18, CALLI_DYING19, CALLI_DYING20,
+               CALLI_DYING21, CALLI_DYING22, CALLI_DYING23]
+
 
 class Box(object):
     def __init__(self, x, y, length, color):
@@ -179,9 +231,11 @@ def draw_window(redBox, shoot, framenum, angle, player, wind_spd, blue_hp, red_h
         win_text = WIN_FONT.render("RED WINS", 1, RED)
         WIN.blit(win_text, (WIDTH//2-win_text.get_width()//2, 100))
     if red_hp > 0:
-        WIN.blit(CALLIOPE[framenum//4 % len(CALLIOPE)],
+        WIN.blit(CALLIOPE[framenum//3 % len(CALLIOPE)],
                  (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
     else:
+        WIN.blit(CALLI_DYING[framenum//4 % len(CALLI_DYING)],
+                 (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
         win_text = WIN_FONT.render("BLUE WINS", 1, BLUE)
         WIN.blit(win_text, (WIDTH//2-win_text.get_width()//2, 100))
 
