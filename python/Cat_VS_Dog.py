@@ -14,6 +14,7 @@ pygame.display.set_caption("Cat VS Dog")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 FPS = 60
 GRAV = 5
 BOX_LENGTH = 30
@@ -39,6 +40,7 @@ HP_WIDTH = 4
 
 HP_FONT = pygame.font.SysFont('comicsans', 12)
 WIND_FONT = pygame.font.SysFont('comicsans', 30)
+WIN_FONT = pygame.font.SysFont('comicsans', 80)
 
 # https://www.freepik.com/vectors/alien-planet Alien planet vector created by upklyak
 BACKGROUND = pygame.transform.scale(pygame.image.load(
@@ -174,9 +176,14 @@ def draw_window(redBox, shoot, framenum, angle, player, wind_spd, blue_hp, red_h
     else:
         WIN.blit(GURA_SPIN[framenum//4 % len(GURA_SPIN)],
                  (BLUE_POSX, BLUE_POSY-PLAYER_HEIGHT))
+        win_text = WIN_FONT.render("RED WINS", 1, RED)
+        WIN.blit(win_text, (WIDTH//2-win_text.get_width()//2, 100))
     if red_hp > 0:
         WIN.blit(CALLIOPE[framenum//4 % len(CALLIOPE)],
                  (RED_POSX-PLAYER_WIDTH, RED_POSY-PLAYER_HEIGHT))
+    else:
+        win_text = WIN_FONT.render("BLUE WINS", 1, BLUE)
+        WIN.blit(win_text, (WIDTH//2-win_text.get_width()//2, 100))
 
     WIN.blit(FLOOR, (0, HEIGHT-15))
 
@@ -190,9 +197,9 @@ def draw_window(redBox, shoot, framenum, angle, player, wind_spd, blue_hp, red_h
         wind_spd_text2 = HP_FONT.render("-", 1, BLACK)
 
     WIN.blit(wind_spd_text2, (WIDTH//2-wind_spd_text2.get_width()//2, 18))
-    blue_hp_text = HP_FONT.render("HP: " + str(blue_hp), 1, BLACK)
+    blue_hp_text = HP_FONT.render("BLUE | HP: " + str(blue_hp), 1, BLACK)
     WIN.blit(blue_hp_text, (3, 3))
-    red_hp_text = HP_FONT.render("HP: " + str(red_hp), 1, BLACK)
+    red_hp_text = HP_FONT.render("RED | HP: " + str(red_hp), 1, BLACK)
     WIN.blit(red_hp_text, (WIDTH-red_hp_text.get_width()-3, 3))
 
     for i in range(1, blue_hp):
