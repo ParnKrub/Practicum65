@@ -203,7 +203,7 @@ def block_collide_wall(po):
 
 
 def change_player(color, redBox):
-    redBox.y = HEIGHT-BOX_LENGTH - 30
+    redBox.y = HEIGHT - BOX_LENGTH - 30
     if color == 'RED':
         redBox.x = BOX_START_POS_BLUE
         return 'BLUE'
@@ -228,8 +228,15 @@ def main():
     blue_hp = 100
     red_hp = 100
     while run:
-
         clock.tick(FPS)
+        if blue_hp <= 0:
+            print("Red wins")
+            pygame.time.delay(1000)
+            run = False
+        elif red_hp <= 0:
+            print("Blue wins")
+            pygame.time.delay(1000)
+            run = False
         pos = pygame.mouse.get_pos()
         if player == 'BLUE':
             line = [(BOX_START_POS_BLUE, HEIGHT-BOX_LENGTH-30), pos]
